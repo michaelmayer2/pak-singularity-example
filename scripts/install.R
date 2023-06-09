@@ -62,9 +62,10 @@ pkg_install(cran_packages,lib=libdir)
 paste("XXX :",currver,": Installing BioC packages")
 pkg_install(bc_packages,lib=libdir)
 
+.libPaths(c(libdir, .libPaths()))
 paste("XXX :",currver,": Installing github packages")
-remotes::install_github('davidsjoberg/ggsankey@3e171a8',lib=libdir)
-remotes::install_github('Mikata-Project/ggthemr@f04aca6',lib=libdir)
-remotes::install_github('federicomarini/pcaExplorer@4a87c29',lib=libdir, dependencies = TRUE)
-remotes::install_github('federicomarini/ideal@6a0b6df',lib=libdir, dependencies = TRUE)
-remotes::install_github('cellgeni/sceasy@0cfc0e3',lib=libdir)
+pkg_install(c('davidsjoberg/ggsankey@3e171a8',
+	      'Mikata-Project/ggthemr@f04aca6',
+	      'federicomarini/pcaExplorer@4a87c29',
+	      'federicomarini/ideal@6a0b6df',
+	      'cellgeni/sceasy@0cfc0e3'),lib=libdir)
