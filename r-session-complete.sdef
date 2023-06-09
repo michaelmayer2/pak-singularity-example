@@ -1,0 +1,86 @@
+Bootstrap: docker
+From: rstudio/r-session-complete:jammy-2023.03.1
+
+# needed if you want to set up CRAN and BioConductor repos from RSPM (optional)
+# set binaryflag to "" in order to stick to source RPMs
+%files
+    scripts/setup.R /
+    scripts/install.R /
+    scripts/r-packages-bioconductor.txt /
+    scripts/r-packages-cran.txt /
+
+%post
+    #!/bin/bash
+    # Install Java JDK (optional)
+    apt-get update -y && \
+        DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	    default-jdk
+
+    # Install gdebi-core
+    apt-get -y install gdebi-core
+
+    # clean any pre-existing R installation
+    dpkg -l | grep "  r-" | awk '{print $2}' | xargs apt remove  -y
+    rm -rf /opt/R /usr/local/bin/R /usr/local/bin/Rscript
+
+    # Add requirenments for: rjags DirichletMultinomial archive rpmi redux Rmpfr pdftools clustermq qqconf
+    apt install -y libgraphviz-dev
+#jags libgsl-dev libarchive-dev libopenmpi-dev libhiredis-dev libmpfr-dev libpoppler-cpp-dev libzmq3-dev libfftw3-dev
+
+    # Install and configure new set of defined R versions
+    R_VERSIONS="4.2.3 4.3.0"
+    for R_VERSION in ${R_VERSIONS}
+    do
+        curl -O https://cdn.rstudio.com/r/ubuntu-2204/pkgs/r-${R_VERSION}_1_amd64.deb && \
+        gdebi -n r-${R_VERSION}_1_amd64.deb && \
+        rm -f r-${R_VERSION}_1_amd64.deb
+        rm -f /usr/local/bin/R /usr/local/bin/Rscript
+        ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R
+        ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
+
+    	# Reconfigure R for Java (optional)
+    	/opt/R/${R_VERSION}/bin/R CMD javareconf
+
+    	# Set up R to use latest CRAN and bioconductor repositories
+        # from public RSPM (optional) and install packages
+    	/opt/R/${R_VERSION}/bin/Rscript /setup.R
+	/opt/R/${R_VERSION}/bin/Rscript /install.R  
+    done
+    wait
+
+    # Needed if using CRAN and BioConductor repos from RSPM (optional)
+    rm -f /setup.R /install.R /r-packages-cran.txt /r-packages-bioconductor.txt
+
+    # Install SLURM
+    groupadd -g 401 slurm
+    useradd -u 401 -g 401 slurm
+    apt-get install -y libmunge-dev
+
+    # Output of `sinfo -V`
+    export SLURM_VERSION=22.05.8
+
+    # Note that the git branches on github do have a slightly different
+    # naming scheme - firstly the dots are replaced by dashes and
+    # secondly each SLURM version can have more than one release tag
+    # Here, we simply append "-1" to use the first git tag of a given
+    # SLURM version
+
+    mkdir -p /tmp/build && \
+        cd /tmp/build && \
+        rm -rf slurm && \
+        # Note that the git branches on github do have a slightly different
+        # naming scheme - firstly the dots are replaced by dashes and
+        # secondly each SLURM version can have more than one release tag
+        # Here, we simply append "-1" to use the first git tag of a given
+        # SLURM version
+        bash -c "git clone --depth 1 -b slurm-\${SLURM_VERSION//./-}-1 https://github.com/SchedMD/slurm.git" && \
+        cd slurm && \
+	./configure --prefix /usr/local/slurm && \
+	make -j 4 && make install && \
+	cd / && \
+	rm -rf /tmp/build
+
+
+%environment
+    export PATH=/usr/local/slurm/bin:$PATH
+    export SLURM_CONF=/opt/slurm/etc/slurm.conf
