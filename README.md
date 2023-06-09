@@ -12,7 +12,7 @@ This repo aims at showing an example on how to seamlessly set up a Singularity/A
 If the folder identified in the last step is `/scratch/data/tmp`, then run 
 
 ```
-singularity build -B /scratch/data/tmp:/tmp r-sif4.sif r-session-complete.sdef
+singularity build -B /scratch/data/tmp:/tmp r-session-complete.sif r-session-complete.sdef
 ```   
 
 ## Additional information
