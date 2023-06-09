@@ -37,15 +37,10 @@ dir.create(libdir,recursive=TRUE)
 
 tmpdir<-tempdir()
 
-install.packages(c("rjson","RCurl","BiocManager","remotes","pkgsearch","pkgdepends","pkgcache","distro"),tmpdir, repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
+install.packages(c("rjson","RCurl","BiocManager"),tmpdir, repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
 .libPaths(tmpdir)
 library(RCurl)
 library(rjson)
-remotes::install_github("michaelmayer2/pak@e2a3c95f",lib=tmpdir)
-pak:::create_dev_lib()
-jsondata<-fromJSON(file="https://raw.githubusercontent.com/rstudio/rstudio/main/src/cpp/session/resources/dependencies/r-packages.json")
-pnames<-c()
-for (feature in jsondata$features) { pnames<-unique(c(pnames,feature$packages)) }
 
 currver <- paste0(R.Version()$major,".",R.Version()$minor)
 paste("version",currver)
@@ -79,11 +74,6 @@ releasedate <- getreleasedate(as.Date(releasedate))
 
 #Final CRAN snapsot URL
 repo=paste0(pmurl,"/cran/",binaryflag,releasedate)
-
-#avpack<-available.packages(paste0(repo,"/src/contrib"))
-
-#Install all packages needed for RSW
-#pkg_install(pnames[pnames %in% avpack],repos=repo,libdir)
 
 sink(paste0("/opt/R/",currver,"/lib/R/etc/Renviron.site"), append=TRUE)
   cat("RENV_PATHS_PREFIX_AUTO=TRUE\n")
