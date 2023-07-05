@@ -9,20 +9,24 @@ repos<-readLines(paste0("/tmp/repos-",currver))
 
 tmpdir<-tempdir()
 
-install.packages(c("rjson","RCurl","BiocManager","bitops","remotes","pkgsearch","pkgdepends","pkgcache","distro"),tmpdir)
+install.packages(c("rjson","RCurl","BiocManager","bitops","remotes","pkgsearch","pkgdepends","pkgcache","distro"),tmpdir,repos="https://packagemanager.rstudio.com/cran/__linux__/jammy/2023-06-08/")
 .libPaths(tmpdir)
 library(RCurl)
 library(rjson)
-remotes::install_github("michaelmayer2/pak@688afc37",lib=tmpdir)
-pak:::create_dev_lib()
+
+paste("XXX :",currver,": remotes::install_github")
+remotes::install_github("michaelmayer2/pak@b95f2238",lib=tmpdir)
 
 .libPaths(tmpdir)
 library(rjson)
 Sys.setenv("PKGCACHE_HTTP_VERSION" = "2")
 library(pak)
+
+paste("XXX :",currver,": pak:::create_dev_lib()")
 pak:::create_dev_lib()
 
 jsondata<-fromJSON(file="https://raw.githubusercontent.com/rstudio/rstudio/main/src/cpp/session/resources/dependencies/r-packages.json")
+
 pnames<-c()
 for (feature in jsondata$features) { pnames<-unique(c(pnames,feature$packages)) }
 avpack<-available.packages()
