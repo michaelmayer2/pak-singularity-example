@@ -13,7 +13,7 @@ install.packages(c("rjson","RCurl","BiocManager","bitops","remotes","pkgsearch",
 .libPaths(tmpdir)
 library(RCurl)
 library(rjson)
-remotes::install_github("michaelmayer2/pak@e2a3c95f",lib=tmpdir)
+remotes::install_github("michaelmayer2/pak@688afc37",lib=tmpdir)
 pak:::create_dev_lib()
 
 .libPaths(tmpdir)
