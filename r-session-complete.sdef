@@ -4,8 +4,7 @@ From: rstudio/r-session-complete:jammy-2023.03.1
 # needed if you want to set up CRAN and BioConductor repos from RSPM (optional)
 # set binaryflag to "" in order to stick to source RPMs
 %files
-    scripts/setup.R /
-    scripts/install.R /
+    scripts/run.R /
     scripts/r-packages-bioconductor.txt /
     scripts/r-packages-cran.txt /
 
@@ -43,8 +42,7 @@ From: rstudio/r-session-complete:jammy-2023.03.1
 
     	# Set up R to use latest CRAN and bioconductor repositories
         # from public RSPM (optional) and install packages
-    	/opt/R/${R_VERSION}/bin/Rscript /setup.R
-	/opt/R/${R_VERSION}/bin/Rscript /install.R  
+    	/opt/R/${R_VERSION}/bin/Rscript /run.R 
     done
     wait
 

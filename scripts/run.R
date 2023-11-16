@@ -180,7 +180,12 @@ sink()
 # system(sysdeps$install_scripts)
 # system(sysdeps$post_install)
 
-paste("Installing packages for RSW integration")
+# Install customer provided CRAN and Bioconductor packages
+paste("Installing packages for CRAN and Bioconductor")
+
+packages_needed=c(readLines("/r-packages-bioconductor.txt"),
+                readLines("/r-packages-cran.txt"))
+
 pak::pkg_install(packages_needed,lib=libdir)
 paste("Creating lock file for further reproducibility")
 pak::lockfile_create(packages_needed,lockfile=paste0(libdir,"/pkg.lock"))
