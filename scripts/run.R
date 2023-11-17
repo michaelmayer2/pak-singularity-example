@@ -118,6 +118,8 @@ library(BiocManager,lib.loc=pkgtempdir,quietly=TRUE,verbose=FALSE)
 # Version of BioConductor as given by BiocManager (can also be manually set)
 biocvers <- BiocManager::version()
 
+paste("Bioconductor version selected", as.character(biocvers))
+
 paste("Defining repos and setting them up in repos.conf as well as Rprofile.site")
 # Bioconductor Repositories
 r<-BiocManager::repositories(version=biocvers)
@@ -207,9 +209,9 @@ packages_selected=packages_needed[!packages_needed %in% baserecinst_packages]
 options(Ncpus=8)
 #pak::pkg_install(packages_selected,lib=libdir)
 paste("Creating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"))
-pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
+#pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
 paste("Installing packages from lockfile in ", paste0(libdir,"/pkg.lock"))
-pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
+#pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
 
 paste("Setting up global renv cache")
 sink(paste0("/opt/R/",currver,"/lib/R/etc/Renviron.site"), append=TRUE)
