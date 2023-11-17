@@ -54,12 +54,8 @@ dir.create(libdir,recursive=TRUE)
 pkgtempdir<-tempdir()
 .libPaths(pkgtempdir)
 
-install.packages(c("rjson","RCurl","pak","BiocManager"),pkgtempdir, repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
+install.packages(c("RCurl","pak","BiocManager"),pkgtempdir, repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
 
-
-jsondata<-rjson::fromJSON(file="https://raw.githubusercontent.com/rstudio/rstudio/main/src/cpp/session/resources/dependencies/r-packages.json")
-pnames<-c()
-for (feature in jsondata$features) { pnames<-unique(c(pnames,feature$packages)) }
 
 currver <- paste0(R.Version()$major,".",R.Version()$minor)
 paste("version",currver)
@@ -110,7 +106,7 @@ options(BIOCONDUCTOR_CONFIG_FILE = paste0(pmurl,"/bioconductor/config.yaml"))
 sink()
 
 # Make sure BiocManager is loaded - needed to determine BioConductor Version
-library(BiocManager,lib.loc="/tmp/curl",quietly=TRUE,verbose=FALSE)
+library(BiocManager,lib.loc=pkgtempdir,quietly=TRUE,verbose=FALSE)
 
 # Version of BioConductor as given by BiocManager (can also be manually set)
 biocvers <- BiocManager::version()
@@ -190,10 +186,8 @@ sink()
 # Install customer provided CRAN and Bioconductor packages
 paste("Installing packages for CRAN and Bioconductor")
 
-.libPaths("/tmp/curl")
-
-packages_needed=c(readLines("scripts/r-packages-bioconductor.txt"),
-                readLines("scripts/r-packages-cran.txt"))
+packages_needed=c(readLines("r-packages-bioconductor.txt"),
+                readLines("r-packages-cran.txt"))
 
 # Let's filter out any installed base and recommended packages 
 available_packages=as.data.frame(available.packages())
