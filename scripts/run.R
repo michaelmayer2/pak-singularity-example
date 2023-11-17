@@ -49,15 +49,15 @@ libdir <- paste0(basepackagedir,"/",currver)
 
 if(dir.exists(libdir)) {unlink(libdir,recursive=TRUE)}
 dir.create(libdir,recursive=TRUE)
-.libPaths(libdir)
 
-if(dir.exists("/tmp/curl")) {unlink("/tmp/curl",recursive=TRUE)}
-dir.create("/tmp/curl")
-install.packages(c("rjson","RCurl","pak","BiocManager"),"/tmp/curl", repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
-library(RCurl,lib.loc="/tmp/curl")
-library(rjson,lib.loc="/tmp/curl")
+#directory for temporary packages
+pkgtempdir<-tempdir()
+.libPaths(pkgtempdir)
 
-jsondata<-fromJSON(file="https://raw.githubusercontent.com/rstudio/rstudio/main/src/cpp/session/resources/dependencies/r-packages.json")
+install.packages(c("rjson","RCurl","pak","BiocManager"),pkgtempdir, repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
+
+
+jsondata<-rjson::fromJSON(file="https://raw.githubusercontent.com/rstudio/rstudio/main/src/cpp/session/resources/dependencies/r-packages.json")
 pnames<-c()
 for (feature in jsondata$features) { pnames<-unique(c(pnames,feature$packages)) }
 
@@ -68,6 +68,21 @@ paste("version",currver)
 releasedate <- as.Date(paste0(R.version$year,"-",R.version$month,"-",R.version$day))
 paste("release", releasedate)
  
+#Try to figure out if the needed Bioconductor release is older than the most recents
+# If yes, use the release date of bioconduct version + 1 as a start date for looking 
+# into CRAN snapshots - if no, use the current date
+getbiocreleasedate <- function(biocvers){
+  biocdata<-read.csv("bioc.txt")
+  
+  splitbioc<-strsplit(biocvers,"[.]")[[1]]
+  biocversnext<-paste0(splitbioc[1],".",as.integer(splitbioc[2])+1)
+  
+  repodate<-biocdata$Date[which(biocdata$X.Release==biocversnext)]
+  if (identical(repodate,character(0))) repodate<-Sys.Date()
+
+  return(repodate)
+}
+
 #Attempt to install packages from snapshot - if snapshot does not exist, decrease day by 1 and try again
 getreleasedate <- function(repodate){
   
@@ -84,18 +99,6 @@ getreleasedate <- function(repodate){
  }
  return(repodate)
 }
-
-releasedate <- getreleasedate(as.Date(releasedate)+60)
-paste("snapshot selected", releasedate)
-
-#Final CRAN snapsot URL
-repo=paste0(pmurl,"/cran/",binaryflag,releasedate)
-options(repos=c(CRAN=repo))
-
-paste("CRAN Snapshot", repo)
-
-library(pak,lib.loc="/tmp/curl")
-.libPaths("/tmp/curl")
 
 paste("Configuring Bioconductor")
 # Prepare for Bioconductor
@@ -115,6 +118,16 @@ biocvers <- BiocManager::version()
 paste("Defining repos and setting them up in repos.conf as well as Rprofile.site")
 # Bioconductor Repositories
 r<-BiocManager::repositories(version=biocvers)
+
+paste("Determining compatible CRAN snapshot")
+releasedate <- getreleasedate(getbiocreleasedate(biocvers))
+
+
+#Final CRAN snapsot URL
+repo=paste0(pmurl,"/cran/",binaryflag,releasedate)
+options(repos=c(CRAN=repo))
+
+paste("CRAN Snapshot selected", repo)
 
 # enforce CRAN is set to our snapshot 
 r["CRAN"]<-repo
@@ -182,6 +195,8 @@ sink()
 
 # Install customer provided CRAN and Bioconductor packages
 paste("Installing packages for CRAN and Bioconductor")
+
+.libPaths("/tmp/curl")
 
 packages_needed=c(readLines("/r-packages-bioconductor.txt"),
                 readLines("/r-packages-cran.txt"))
