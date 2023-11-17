@@ -113,7 +113,7 @@ options(BIOCONDUCTOR_CONFIG_FILE = paste0(pmurl,"/bioconductor/config.yaml"))
 sink()
 
 # Make sure BiocManager is loaded - needed to determine BioConductor Version
-library(BiocManager,lib.loc=pkgtempdir,quietly=TRUE,verbose=FALSE)
+#library(BiocManager,lib.loc=pkgtempdir,quietly=TRUE,verbose=FALSE)
 
 # Version of BioConductor as given by BiocManager (can also be manually set)
 biocvers <- BiocManager::version()
@@ -207,9 +207,10 @@ baserecinst_packages=baserec_packages[baserec_packages %in% as.data.frame(instal
 packages_selected=packages_needed[!packages_needed %in% baserecinst_packages]
 
 options(Ncpus=8)
+Sys.setenv("R_BIOC_VERSION"=as.character(biocvers))
 #pak::pkg_install(packages_selected,lib=libdir)
-paste("Creating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"))
-#pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
+paste("Crpeating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"))
+pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
 paste("Installing packages from lockfile in ", paste0(libdir,"/pkg.lock"))
 #pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
 
@@ -219,4 +220,6 @@ sink(paste0("/opt/R/",currver,"/lib/R/etc/Renviron.site"), append=TRUE)
   cat(paste0("RENV_PATHS_CACHE=", renvdir, "\n"))
   cat(paste0("RENV_PATHS_SANDBOX=", renvdir, "/sandbox\n"))
 sink()
+
+unlink(pkgtempdir,recursive=TRUE)
 
