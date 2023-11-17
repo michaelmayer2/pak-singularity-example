@@ -74,7 +74,7 @@ paste("release", releasedate)
 getbiocreleasedate <- function(biocvers){
   biocdata<-read.csv("bioc.txt")
   
-  splitbioc<-strsplit(biocvers,"[.]")[[1]]
+  splitbioc<-strsplit(as.character(biocvers),"[.]")[[1]]
   biocversnext<-paste0(splitbioc[1],".",as.integer(splitbioc[2])+1)
   
   repodate<-biocdata$Date[which(biocdata$X.Release==biocversnext)]
