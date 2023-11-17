@@ -212,7 +212,7 @@ Sys.setenv("R_BIOC_VERSION"=as.character(biocvers))
 paste("Crpeating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"))
 pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
 paste("Installing packages from lockfile in ", paste0(libdir,"/pkg.lock"))
-#pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
+pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
 
 paste("Setting up global renv cache")
 sink(paste0("/opt/R/",currver,"/lib/R/etc/Renviron.site"), append=TRUE)
