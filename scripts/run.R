@@ -187,29 +187,25 @@ cat('})\n')
 }
 sink()
 
-
-# #Install all packages and their dependencies needed for RSW
-# os_name=system(". /etc/os-release && echo $ID", intern = TRUE)
-# os_vers=system(". /etc/os-release && echo $VERSION_ID", intern = TRUE)
-
-# paste("Installing system dependencies")
-# sysdeps<-pak::pkg_sysreqs(packages_needed)
-# system(sysdeps$pre_install)
-# system(sysdeps$install_scripts)
-# system(sysdeps$post_install)
-
 # Install customer provided CRAN and Bioconductor packages
 paste("Installing packages for CRAN and Bioconductor")
 
 .libPaths("/tmp/curl")
 
-packages_needed=c(readLines("/r-packages-bioconductor.txt"),
-                readLines("/r-packages-cran.txt"))
+packages_needed=c(readLines("scripts/r-packages-bioconductor.txt"),
+                readLines("scripts/r-packages-cran.txt"))
+
+# Let's filter out any installed base and recommended packages 
+available_packages=as.data.frame(available.packages())
+baserec_packages=available_packages$Package[which(!is.na(available_packages$Priority))]
+baserecinst_packages=baserec_packages[baserec_packages %in% as.data.frame(installed.packages())$Package]
+
+packages_selected=packages_needed[!packages_needed %in% baserecinst_packages]
 
 options(Ncpus=4)
-pak::pkg_install(packages_needed,lib=libdir)
+pak::pkg_install(packages_selected,lib=libdir)
 paste("Creating lock file for further reproducibility")
-pak::lockfile_create(packages_needed,lockfile=paste0(libdir,"/pkg.lock"))
+pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
 
 paste("Setting up global renv cache")
 sink(paste0("/opt/R/",currver,"/lib/R/etc/Renviron.site"), append=TRUE)
