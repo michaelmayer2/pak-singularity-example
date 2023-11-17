@@ -54,8 +54,15 @@ dir.create(libdir,recursive=TRUE)
 pkgtempdir<-tempdir()
 .libPaths(pkgtempdir)
 
-install.packages(c("RCurl","pak","BiocManager"),pkgtempdir, repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
+install.packages(c("RCurl","BiocManager"),pkgtempdir, repos=paste0(pmurl,"/cran/",binaryflag,"latest"))
 
+#nightly pak install until 0.6.0+ is released (bug with MASS)
+install.packages("pak", pkgtempdir, repos = sprintf(
+"https://r-lib.github.io/p/pak/devel/%s/%s/%s",
+.Platform$pkgType,
+R.Version()$os,
+R.Version()$arch
+))
 
 currver <- paste0(R.Version()$major,".",R.Version()$minor)
 paste("version",currver)
