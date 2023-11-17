@@ -7,6 +7,7 @@ From: rstudio/r-session-complete:jammy-2023.03.1
     scripts/run.R /
     scripts/r-packages-bioconductor.txt /
     scripts/r-packages-cran.txt /
+    scripts/r-packages-github.txt /
     scripts/bioc.txt /
 
 %post
