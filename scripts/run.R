@@ -206,8 +206,9 @@ packages_selected=packages_needed[!packages_needed %in% baserecinst_packages]
 
 options(Ncpus=8)
 #pak::pkg_install(packages_selected,lib=libdir)
-paste("Creating lock file for further reproducibility")
+paste("Creating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"))
 pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
+paste("Installing packages from lockfile in ", paste0(libdir,"/pkg.lock"))
 pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
 
 paste("Setting up global renv cache")
