@@ -205,9 +205,10 @@ baserecinst_packages=baserec_packages[baserec_packages %in% as.data.frame(instal
 packages_selected=packages_needed[!packages_needed %in% baserecinst_packages]
 
 options(Ncpus=8)
-pak::pkg_install(packages_selected,lib=libdir)
+#pak::pkg_install(packages_selected,lib=libdir)
 paste("Creating lock file for further reproducibility")
 pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
+pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
 
 paste("Setting up global renv cache")
 sink(paste0("/opt/R/",currver,"/lib/R/etc/Renviron.site"), append=TRUE)
