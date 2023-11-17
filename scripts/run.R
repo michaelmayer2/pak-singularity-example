@@ -194,7 +194,8 @@ sink()
 paste("Installing packages for CRAN and Bioconductor")
 
 packages_needed=c(readLines("r-packages-bioconductor.txt"),
-                readLines("r-packages-cran.txt"))
+                readLines("r-packages-cran.txt"),
+                readLines("r-packages-github.txt"))
 
 # Let's filter out any installed base and recommended packages 
 available_packages=as.data.frame(available.packages())
