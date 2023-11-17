@@ -78,7 +78,7 @@ getbiocreleasedate <- function(biocvers){
   biocversnext<-paste0(splitbioc[1],".",as.integer(splitbioc[2])+1)
   
   repodate<-biocdata$Date[which(biocdata$X.Release==biocversnext)]
-  if (identical(repodate,character(0))) repodate<-Sys.Date()
+  if (identical(repodate,character(0))) repodate<-"latest"
 
   return(repodate)
 }
@@ -120,7 +120,12 @@ paste("Defining repos and setting them up in repos.conf as well as Rprofile.site
 r<-BiocManager::repositories(version=biocvers)
 
 paste("Determining compatible CRAN snapshot")
-releasedate <- getreleasedate(getbiocreleasedate(biocvers))
+biocreleasedate <- getbiocreleasedate(biocvers)
+if (identical(biocreleasedate,"latest")) {
+    releasedate <- "latest" 
+} else {
+  releasedate <- getreleasedate(biocreleasedate)
+}
 
 
 #Final CRAN snapsot URL
@@ -201,6 +206,7 @@ paste("Installing packages for CRAN and Bioconductor")
 packages_needed=c(readLines("/r-packages-bioconductor.txt"),
                 readLines("/r-packages-cran.txt"))
 
+options(Ncpus=4)
 pak::pkg_install(packages_needed,lib=libdir)
 paste("Creating lock file for further reproducibility")
 pak::lockfile_create(packages_needed,lockfile=paste0(libdir,"/pkg.lock"))
