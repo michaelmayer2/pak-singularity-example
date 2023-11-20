@@ -1,3 +1,6 @@
+HPO.db=url::https://github.com/huerqiang/HPO.db_MPO.db/raw/main/HPO.db_0.99.0.tar.gz
+MPO.db=url::https://github.com/huerqiang/HPO.db_MPO.db/raw/main/MPO.db_0.99.0.tar.gz
+Bioconductor/BiocFileCache
 davidsjoberg/ggsankey@3e171a8
 Mikata-Project/ggthemr@f04aca6
 federicomarini/pcaExplorer@1d2a8fd
