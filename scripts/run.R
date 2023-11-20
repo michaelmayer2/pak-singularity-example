@@ -58,11 +58,7 @@ install.packages(c("RCurl","BiocManager"),pkgtempdir, repos=paste0(pmurl,"/cran/
 
 #nightly pak install until 0.6.0+ is released (bug with MASS)
 install.packages("pak", pkgtempdir, repos = sprintf(
-"https://r-lib.github.io/p/pak/devel/%s/%s/%s",
-.Platform$pkgType,
-R.Version()$os,
-R.Version()$arch
-))
+"https://r-lib.github.io/p/pak/devel/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch ))
 
 currver <- paste0(R.Version()$major,".",R.Version()$minor)
 paste("version",currver)
@@ -206,13 +202,12 @@ baserecinst_packages=baserec_packages[baserec_packages %in% as.data.frame(instal
 
 packages_selected=packages_needed[!packages_needed %in% baserecinst_packages]
 
-options(Ncpus=8)
 Sys.setenv("R_BIOC_VERSION"=as.character(biocvers))
 #pak::pkg_install(packages_selected,lib=libdir)
-paste("Crpeating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"))
+paste("Crpeating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"),upgrade=FALSE)
 pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
 paste("Installing packages from lockfile in ", paste0(libdir,"/pkg.lock"))
-pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir, update=FALSE)
+pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir)
 
 paste("Setting up global renv cache")
 sink(paste0("/opt/R/",currver,"/lib/R/etc/Renviron.site"), append=TRUE)

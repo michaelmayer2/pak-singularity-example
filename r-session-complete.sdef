@@ -24,9 +24,9 @@ From: rstudio/r-session-complete:jammy-2023.03.1
     dpkg -l | grep "  r-" | awk '{print $2}' | xargs apt remove  -y
     rm -rf /opt/R /usr/local/bin/R /usr/local/bin/Rscript
 
-    # Add requirenments for: rjags DirichletMultinomial archive rpmi redux Rmpfr pdftools clustermq qqconf
-    apt install -y libgraphviz-dev
-#jags libgsl-dev libarchive-dev libopenmpi-dev libhiredis-dev libmpfr-dev libpoppler-cpp-dev libzmq3-dev libfftw3-dev
+    # Install libcurl4-openssl-dev to avoid package conflicts later on
+    apt install -y libcurl4-openssl-dev
+
 
     # Install and configure new set of defined R versions
     R_VERSIONS="4.2.3 4.3.0"
@@ -49,7 +49,7 @@ From: rstudio/r-session-complete:jammy-2023.03.1
     wait
 
     # Needed if using CRAN and BioConductor repos from RSPM (optional)
-    rm -f /setup.R /install.R /r-packages-cran.txt /r-packages-bioconductor.txt
+    rm -f /run.R /bioc.txt /r-packages-*
 
     # Install SLURM
     groupadd -g 401 slurm
@@ -57,7 +57,7 @@ From: rstudio/r-session-complete:jammy-2023.03.1
     apt-get install -y libmunge-dev
 
     # Output of `sinfo -V`
-    export SLURM_VERSION=22.05.8
+    export SLURM_VERSION=23.02.6
 
     # Note that the git branches on github do have a slightly different
     # naming scheme - firstly the dots are replaced by dashes and
@@ -65,8 +65,8 @@ From: rstudio/r-session-complete:jammy-2023.03.1
     # Here, we simply append "-1" to use the first git tag of a given
     # SLURM version
 
-    mkdir -p /tmp/build && \
-        cd /tmp/build && \
+    tempdir=`mktemp -d` && \
+        cd $tempdir && \
         rm -rf slurm && \
         # Note that the git branches on github do have a slightly different
         # naming scheme - firstly the dots are replaced by dashes and
@@ -78,9 +78,11 @@ From: rstudio/r-session-complete:jammy-2023.03.1
 	./configure --prefix /usr/local/slurm && \
 	make -j 4 && make install && \
 	cd / && \
-	rm -rf /tmp/build
+	rm -rf $tempdir
 
-    rm -rf /root/.cache
+    rm -rf /var/cache
+
+
 
 %environment
     export PATH=/usr/local/slurm/bin:$PATH

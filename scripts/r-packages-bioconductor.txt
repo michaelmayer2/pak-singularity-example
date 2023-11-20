@@ -8,7 +8,6 @@ BSgenome
 BSgenome.Hsapiens.UCSC.hg19
 BSgenome.Hsapiens.UCSC.hg38
 Biobase
-BiocFileCache
 BiocGenerics
 BiocIO
 BiocParallel
