@@ -204,7 +204,7 @@ packages_selected=packages_needed[!packages_needed %in% baserecinst_packages]
 
 Sys.setenv("R_BIOC_VERSION"=as.character(biocvers))
 #pak::pkg_install(packages_selected,lib=libdir)
-paste("Crpeating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"),upgrade=FALSE)
+paste("Creating lock file for further reproducibility in", paste0(libdir,"/pkg.lock"),upgrade=FALSE)
 pak::lockfile_create(packages_selected,lockfile=paste0(libdir,"/pkg.lock"))
 paste("Installing packages from lockfile in ", paste0(libdir,"/pkg.lock"))
 pak::lockfile_install(lockfile=paste0(libdir,"/pkg.lock"), lib=libdir)
